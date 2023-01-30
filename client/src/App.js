@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import "./App.css";
 import Axios from "axios";
-// Library axios
+// Library axios => try it out
 
 function App() {
   const [name, setName] = useState("");
@@ -11,6 +11,8 @@ function App() {
   const [weight, setWeight] = useState(0);
 
   const [catList, setCatList] = useState([]);
+
+  const [newWeight, setNewWeight] = useState(0);
 
   const addKitty = () => {
     // server: http://localhost:3001/
@@ -32,6 +34,43 @@ function App() {
   const getKitties = () => {
     Axios.get("http://localhost:3001/kitties").then((response) => {
       setCatList(response.data);
+    });
+  };
+
+  // update
+  const updateCat = (id) => {
+    Axios.put("http://localhost:3001/update", {
+      weight: newWeight,
+      id: id,
+    }).then((response) => {
+      // update instant data
+      setCatList(
+        catList.map((value) => {
+          return value.id == id
+            ? {
+                id: value.id,
+                name: value.name,
+                gender: value.gender,
+                breed: value.breed,
+                weight: value.newWeight,
+                // test newWeight
+              }
+            : value;
+        })
+      );
+      console.log(response);
+    });
+  };
+
+  // delete
+  const deleteCat = (id) => {
+    Axios.delete(`http://localhost:3001/delete/${id}`).then((response) => {
+      // update data filter that out..
+      setCatList(
+        catList.filter((value) => {
+          return value.id != id;
+        })
+      );
     });
   };
 
@@ -57,11 +96,29 @@ function App() {
         {catList.map((cat, index) => {
           return (
             <div key={index} className="cat">
-              <h3>Name: {cat.name}</h3>
-              <h3>Gender: {cat.gender}</h3>
-              <h3>Age: {cat.age}</h3>
-              <h3>Breed: {cat.breed}</h3>
-              <h3>Weight: {cat.weight}</h3>
+              <div>
+                <h3>Name: {cat.name}</h3>
+                <h3>Gender: {cat.gender}</h3>
+                <h3>Age: {cat.age}</h3>
+                <h3>Breed: {cat.breed}</h3>
+                <h3>Weight: {cat.weight}</h3>
+              </div>
+              {/* update inputs */}
+              <div>
+                <input
+                  type="number"
+                  placeholder={weight}
+                  onChange={(e) => setNewWeight(e.target.value)}
+                />
+                <button
+                  onClick={() => {
+                    updateCat(cat.id);
+                  }}
+                >
+                  Update
+                </button>
+                <button onClick={() => deleteCat(cat.id)}>Delete</button>
+              </div>
             </div>
           );
         })}

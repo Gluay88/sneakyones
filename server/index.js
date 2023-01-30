@@ -39,9 +39,39 @@ app.post("/create", (req, res) => {
   );
 });
 
+// read
 app.get("/kitties", (req, res) => {
   // table name => cats
   db.query("SELECT * FROM cats", (err, result) => {
+    if (err) {
+      console.log(err);
+    } else {
+      res.send(result);
+    }
+  });
+});
+
+// update
+app.put("/update", (req, res) => {
+  const id = req.body.id;
+  const weight = req.body.weight;
+  db.query(
+    "UPDATE cats SET weight = ? WHERE id = ?",
+    [weight, id],
+    (err, result) => {
+      if (err) {
+        console.log(err);
+      } else {
+        res.send(result);
+      }
+    }
+  );
+});
+
+//delete
+app.delete("/delete/:id", (req, res) => {
+  const id = req.params.id;
+  db.query("DELETE FROM cats WHERE id = ?", id, (err, result) => {
     if (err) {
       console.log(err);
     } else {
